@@ -69,7 +69,7 @@ const Home: Component = () => {
       <form>
         <H2>Find trip</H2>
 
-        <div class="grid grid-cols-3 gap-x-2.5">
+        <div class="grid sm:grid-cols-1 sm:grid-rows-3 md:grid-cols-3 md:grid-rows-1 gap-x-2.5">
           <Row>
             <Label for="from">Departing from</Label>
             <Select id="from" onChange={changeFrom}>
@@ -124,38 +124,38 @@ const Home: Component = () => {
         <Show when={trips()}>
           <H2>Trips</H2>
           <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <thead class="text-gray-700 text-base bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
-                <th>Operator</th>
-                <th>Price</th>
-                <th>Dogs allowed</th>
-                <th>Bicycles allowed</th>
-                <th>Arrival time</th>
-                <th>Depature time</th>
-                <th>Book</th>
+                <th class="py-2 px-4">Operator</th>
+                <th class="py-2 px-4">Price</th>
+                <th class="py-2 px-4">Dogs allowed</th>
+                <th class="py-2 px-4">Bicycles allowed</th>
+                <th class="py-2 px-4">Arrival time</th>
+                <th class="py-2 px-4">Depature time</th>
+                <th class="py-2 px-4">Book</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="text-base">
               <For each={trips()}>
                 {(trip) => (
                   <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                    <td>{trip.operator}</td>
-                    <td>{trip.price}</td>
-                    <td>
+                    <td class="py-2 px-4">{trip.operator}</td>
+                    <td class="py-2 px-4">{trip.price}</td>
+                    <td class="py-2 px-4">
                       <Switch>
                         <Match when={trip.dogsAllowed === true}>Yes</Match>
                         <Match when={trip.dogsAllowed === false}>No</Match>
                       </Switch>
                     </td>
-                    <td>
+                    <td class="py-2 px-4">
                       <Switch>
                         <Match when={trip.bicyclesAllowed === true}>Yes</Match>
                         <Match when={trip.bicyclesAllowed === false}>No</Match>
                       </Switch>
                     </td>
-                    <td>{trip.arrivalTime}</td>
-                    <td>{trip.departureTime}</td>
-                    <td>
+                    <td class="py-2 px-4">{trip.arrivalTime}</td>
+                    <td class="py-2 px-4">{trip.departureTime}</td>
+                    <td class="py-2 px-4">
                       <Button onClick={() => selectTrip(trip)}>
                         <Cart /> Book
                       </Button>
