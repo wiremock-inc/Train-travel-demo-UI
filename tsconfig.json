@@ -11,5 +11,10 @@
     "types": ["vite/client"],
     "noEmit": true,
     "isolatedModules": true,
-  },
+    "paths": {
+      "@wiremock-inc/apimatic-sdkgen-demo/types/*": [
+        "./node_modules/@wiremock-inc/apimatic-sdkgen-demo/dist/types/*"
+      ]
+    }
+  }
 }

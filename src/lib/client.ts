@@ -1,27 +1,14 @@
-import {
-  BookingsController,
-  Client,
-  PaymentsController,
-  StationsController,
-  TripsController,
-} from '@wiremock-inc/apimatic-sdkgen-demo';
+import {TrainTravel} from "@wiremock-inc/train-travel-demo";
 
-const client = new Client({
-  authorizationCodeAuthCredentials: {
-    oAuthClientId: '123213123213',
-    oAuthRedirectUri: '/adadfasdf',
-    oAuthClientSecret: 'adfasfasf',
-    oAuthToken: {
-      accessToken: 'thing',
-      tokenType: 'thing',
-    },
-  },
+const client = new TrainTravel({
+  serverURL: 'https://train-travel-example.wiremockapi.cloud/',
+  oAuth2: 'thing'
 });
 
-const stationsController = new StationsController(client);
-const tripsController = new TripsController(client);
-const bookingsController = new BookingsController(client);
-const paymentsController = new PaymentsController(client);
+const stationsController = client.stations;
+const tripsController = client.trips;
+const bookingsController = client.bookings;
+const paymentsController = client.payments;
 
 export default client;
 
