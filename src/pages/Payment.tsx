@@ -7,7 +7,7 @@ import Hr from '../components/hr';
 import H2 from '../components/typeography/H2';
 import {JSX, Show, createResource, createSignal} from 'solid-js';
 import {bookingsController, paymentsController} from '../lib/client';
-import {useParams} from '@solidjs/router';
+import {A, useParams} from '@solidjs/router';
 import {CurrencyEnum} from '@wiremock-inc/apimatic-sdkgen-demo';
 import {Card} from '@wiremock-inc/apimatic-sdkgen-demo';
 import {default as CardComponent} from '../components/card';
@@ -108,7 +108,10 @@ const Payment = () => {
                             <Show when={paymentResult()}>
                                 <div class="mb-6 text-wrap break-words rounded p-4 bg-green-700">
                                     <h3 class="mb-4 text-2xl font-bold">Payment complete</h3>
-                                    <p class="text-lg">{paymentResult()?.id}</p>
+                                    <p class="text-lg">Your payment reference is: <strong>{paymentResult()?.id}</strong>
+                                    </p>
+                                    <p><A href="/my-bookings" class="text-lg inactive font-bold block my-4">View my
+                                        bookings</A></p>
                                 </div>
                             </Show>
 

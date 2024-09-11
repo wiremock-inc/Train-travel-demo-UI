@@ -1,15 +1,72 @@
 import Hr from '../components/hr';
 import H1 from '../components/typeography/H1';
+import {bookingsController, tripsController} from "../lib/client";
+import {createResource} from "solid-js";
+import {For, Show} from "solid-js";
+import Card from "../components/card";
+import Spinner from "../components/spinner";
+import Button from "../components/forms/button";
+import {Booking} from "@wiremock-inc/apimatic-sdkgen-demo";
 
-const Payment = () => {
+const bookingsFetcher = async () => {
+    const response = await bookingsController.getBookings();
+    return response.result.data;
+};
+
+const MyBookingsPage = () => {
+    const [bookings, {mutate: mutateBookings, refetch: refetchBookings}] = createResource(bookingsFetcher);
+
+    const deleteBooking = async (booking: Booking) => {
+        mutateBookings(bookings()?.filter((b) => b.id !== booking.id));
+
+        try {
+            await bookingsController.deleteBooking(booking.id!);
+        } catch (e) {
+            await refetchBookings();
+        }
+    }
+
     return (
         <>
             <H1>My Bookings</H1>
 
             <Hr/>
 
+            <Show when={bookings.loading}>
+                <Spinner/>
+            </Show>
+            <Show when={!bookings.loading && !bookings()}>
+                <p>You have not made any bookings yet</p>
+            </Show>
+            <Show when={bookings()}>
+                <For each={bookings()}>
+                    {(booking) => (
+                        <Card>
+                            <dl class="grid grid-cols-2 gap-x-4 mb-6">
+                                <dt class="font-bold text-lg">Booking ID</dt>
+                                <dd class="mb-2 text-base">{booking.id}</dd>
+
+                                <dt class="font-bold text-lg">Passenger name</dt>
+                                <dd class="mb-2 text-base">{booking.passengerName}</dd>
+
+                                <dt class="font-bold text-lg">Has dog</dt>
+                                <dd class="mb-2 text-base">{booking.hasDog ? "Yes" : "No"}</dd>
+
+                                <dt class="font-bold text-lg">Has bicycle</dt>
+                                <dd class="mb-2 text-base">{booking.hasBicycle ? "Yes" : "No"}</dd>
+
+                            </dl>
+
+                            <div class="flex gap-4">
+                                <Button onClick={() => deleteBooking(booking)}>Delete booking</Button>
+                            </div>
+                        </Card>
+                    )}
+                </For>
+            </Show>
+
         </>
     );
 };
 
-export default Payment;
+export default MyBookingsPage;
