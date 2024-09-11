@@ -1,31 +1,40 @@
-import { Component, For, Match, Show, Switch, createResource } from 'solid-js';
+import {
+  Component,
+  For,
+  JSX,
+  Match,
+  Show,
+  Switch,
+  createResource,
+} from 'solid-js';
 import Select from '../components/forms/select';
 import Label from '../components/forms/label';
 import Row from '../components/forms/row';
-import { A, useSearchParams } from '@solidjs/router';
+import { A, useNavigate, useSearchParams } from '@solidjs/router';
 import Hr from '../components/hr';
 import H2 from '../components/typeography/H2';
 import { stationsController, tripsController } from '../lib/client';
 import Cart from '../components/icons/cart';
 import Spinner from '../components/spinner';
+import Button from '../components/forms/button';
+import { Trip } from '@wiremock-inc/apimatic-sdkgen-demo';
 
 const fetchStations = async () => {
-  const response = await stationsController.getStations({});
-  console.log(response);
+  const response = await stationsController.getStations();
   return response.result.data;
 };
 
 const fetchTrips = async (state: {
   from?: string;
   to?: string;
-  date?: Date;
+  date?: string;
 }) => {
   if (state.from && state.to && state.date) {
-    const response = await tripsController.getTrips({
-      date: state.date,
-      origin: state.to,
-      destination: state.from
-    });
+    const response = await tripsController.getTrips(
+      state.from,
+      state.to,
+      state.date,
+    );
 
     return response.result.data;
   }
@@ -36,15 +45,24 @@ const Home: Component = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [stations] = createResource(fetchStations);
   const derivedState = () => {
-    if (searchParams.from && searchParams.to && searchParams.date) {
-      return {
-        from: searchParams.from,
-        to: searchParams.to,
-        date: new Date(searchParams.date),
-      };
-    }
+    return {
+      from: searchParams.from,
+      to: searchParams.to,
+      date: searchParams.date,
+    };
   };
   const [trips] = createResource(derivedState, fetchTrips);
+  const navigate = useNavigate();
+  const selectTrip = (trip: Trip) => {
+    navigate(`/booking/${trip.id}`);
+  };
+
+  const changeFrom: JSX.EventHandler<HTMLSelectElement, InputEvent> = (e) =>
+    setSearchParams({ from: e.currentTarget.value });
+  const changeTo: JSX.EventHandler<HTMLSelectElement, InputEvent> = (e) =>
+    setSearchParams({ to: e.currentTarget.value });
+  const changeDate: JSX.EventHandler<HTMLInputElement, Event> = (e) =>
+    setSearchParams({ date: e.currentTarget.value });
 
   return (
     <div class="text-left">
@@ -54,10 +72,7 @@ const Home: Component = () => {
         <div class="grid sm:grid-cols-1 sm:grid-rows-3 md:grid-cols-3 md:grid-rows-1 gap-x-2.5">
           <Row>
             <Label for="from">Departing from</Label>
-            <Select
-              id="from"
-              onChange={(e) => setSearchParams({ from: e.currentTarget.value })}
-            >
+            <Select id="from" onChange={changeFrom}>
               <option>Select</option>
               <For each={stations()}>
                 {(station) => (
@@ -73,10 +88,7 @@ const Home: Component = () => {
           </Row>
           <Row>
             <Label for="to">Going to</Label>
-            <Select
-              id="to"
-              onChange={(e) => setSearchParams({ to: e.currentTarget.value })}
-            >
+            <Select id="to" onChange={changeTo}>
               <option>Select</option>
               <For each={stations()}>
                 {(station) => (
@@ -93,7 +105,7 @@ const Home: Component = () => {
           <Row>
             <Label for="date">Depature date</Label>
             <input
-              onChange={(e) => setSearchParams({ date: e.currentTarget.value })}
+              onChange={changeDate}
               id="date"
               type="date"
               value={searchParams.date}
@@ -144,12 +156,9 @@ const Home: Component = () => {
                     <td class="py-2 px-4">{trip.arrivalTime}</td>
                     <td class="py-2 px-4">{trip.departureTime}</td>
                     <td class="py-2 px-4">
-                      <A
-                        href={`/booking/${trip.id}`}
-                        class="flex gap-x-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                      >
+                      <Button onClick={() => selectTrip(trip)}>
                         <Cart /> Book
-                      </A>
+                      </Button>
                     </td>
                   </tr>
                 )}

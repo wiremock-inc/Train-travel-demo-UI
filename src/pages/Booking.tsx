@@ -1,15 +1,14 @@
-import {JSX, ParentComponent} from 'solid-js';
+import { JSX, ParentComponent, Show, createSignal } from 'solid-js';
 import H1 from '../components/typeography/H1';
-import {useNavigate, useParams} from '@solidjs/router';
+import { useNavigate, useParams } from '@solidjs/router';
 import Row from '../components/forms/row';
 import Label from '../components/forms/label';
 import Input from '../components/forms/input';
 import Button from '../components/forms/button';
-import {bookingsController} from '../lib/client';
-import {createStore} from 'solid-js/store';
+import { bookingsController } from '../lib/client';
+import { createStore } from 'solid-js/store';
 import Card from '../components/card';
 import Hr from '../components/hr';
-import {CreateBookingAcceptEnum} from "@wiremock-inc/train-travel-demo/funcs/bookingsCreateBooking";
 
 const BookingPage: ParentComponent = () => {
   const params = useParams();
@@ -38,7 +37,7 @@ const BookingPage: ParentComponent = () => {
   const submit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (e) => {
     e.preventDefault();
 
-    const response = await bookingsController.createBooking(data, { acceptHeaderOverride: CreateBookingAcceptEnum.applicationJson });
+    const response = await bookingsController.createBooking(data);
 
     navigate(`/payment/${response.result.id}`);
   };

@@ -8,16 +8,15 @@ import H2 from '../components/typeography/H2';
 import { JSX, Show, createResource, createSignal } from 'solid-js';
 import { bookingsController, paymentsController } from '../lib/client';
 import { useParams } from '@solidjs/router';
+import { CurrencyEnum } from '@wiremock-inc/apimatic-sdkgen-demo';
+import { Card } from '@wiremock-inc/apimatic-sdkgen-demo';
 import { default as CardComponent } from '../components/card';
 import H1 from '../components/typeography/H1';
 import Spinner from '../components/spinner';
-import {Card} from "@wiremock-inc/train-travel-demo/models/components";
-import {
-  CreateBookingPaymentResponseBody
-} from "@wiremock-inc/train-travel-demo/src/models/operations/createbookingpayment";
+import { BookingsPaymentResponse } from '@wiremock-inc/apimatic-sdkgen-demo';
 
 const bookingFetcher = async (id: string) => {
-  const response = await bookingsController.getBooking({ bookingId: id });
+  const response = await bookingsController.getBooking(id);
   return response.result;
 };
 
@@ -26,7 +25,7 @@ const Payment = () => {
   const [form, setForm] = createStore<Card>({} as Card);
   const [isPosting, setIsPosting] = createSignal(false);
   const [paymentResult, setPaymentResult] = createSignal<
-      CreateBookingPaymentResponseBody | undefined
+    BookingsPaymentResponse | undefined
   >();
   const [paymentError, setPaymentError] = createSignal<Error | undefined>();
   const bookingId = () => params.booking_id;
@@ -37,25 +36,21 @@ const Payment = () => {
     setIsPosting(true);
 
     try {
-      const response = await paymentsController.createBookingPayment({
-        bookingId: params.booking_id,
-        bookingPayment: {
-          amount: 10,
+      const response = await paymentsController.createBookingPayment(
+        params.booking_id,
+        {
+          currency: CurrencyEnum.Gbp,
+          amount: 1000,
           source: {
-
-            object: 'card',
             name: form.name,
-            cvc: form.cvc,
             number: form.number,
+            cvc: form.cvc,
             expMonth: form.expMonth,
             expYear: form.expYear,
-
             addressCountry: form.addressCountry,
           },
-          currency: "gbp"
-        }
-      });
-      console.log('response', response);
+        },
+      );
       setPaymentResult(response.result);
       setIsPosting(false);
       setPaymentError(undefined);

@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@solidjs/router": "^0.13.6",
-    "@wiremock-inc/train-travel-demo": "^0.0.2",
+    "@wiremock-inc/apimatic-sdkgen-demo": "^1.0.3",
     "pnpm": "^9.4.0",
     "solid-js": "^1.8.11"
   }
