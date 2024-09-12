@@ -1,5 +1,5 @@
 import {Component, createResource, JSX,} from 'solid-js';
-import {useNavigate, useSearchParams} from '@solidjs/router';
+import {A, useNavigate, useSearchParams} from '@solidjs/router';
 import H2 from '../components/typeography/H2';
 import {stationsController, tripsController} from '../lib/client';
 import {Trip} from '@wiremock-inc/apimatic-sdkgen-demo';
@@ -27,31 +27,19 @@ const fetchTrips = async (state: {
 };
 
 const HomePage: Component = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [stations] = createResource(fetchStations);
-    const derivedState = () => {
-        return {
-            from: searchParams.from,
-            to: searchParams.to,
-            date: searchParams.date,
-        };
-    };
-    const [trips] = createResource(derivedState, fetchTrips);
-    const navigate = useNavigate();
-    const selectTrip = (trip: Trip) => {
-        navigate(`/booking/${trip.id}`);
-    };
-
-    const changeFrom: JSX.EventHandler<HTMLSelectElement, InputEvent> = (e) =>
-        setSearchParams({from: e.currentTarget.value});
-    const changeTo: JSX.EventHandler<HTMLSelectElement, InputEvent> = (e) =>
-        setSearchParams({to: e.currentTarget.value});
-    const changeDate: JSX.EventHandler<HTMLInputElement, Event> = (e) =>
-        setSearchParams({date: e.currentTarget.value});
-
     return (
-        <div class="text-left">
-            <H2>Welcome</H2>
+        <div class="text-left max-w-2xl mx-auto">
+            <H2>Welcome to WireMocks train travel demo application</H2>
+            <p class="mb-4">This application was developed by WireMock and is based on the Train travel <a
+                href="https://bump.sh/bump-examples/doc/train-travel-api"
+                class="text-blue-400 hover:text-gray-300 hover:underline">OpenAPI
+                spec produced by bump.sh</a>.</p>
+            <p class="mb-4">The application demonstrates the power of WireMock cloud and its OpenAPI support.</p>
+            <p class="mb-4">You can <A href="/booking/new"
+                                       class="text-blue-400 hover:text-gray-300 hover:underline">find a
+                trip</A> and making a booking or <A href="/my-bookings"
+                                                    class="text-blue-400 hover:text-gray-300 hover:underline">manage
+                existing bookings</A>.</p>
         </div>
     );
 };
