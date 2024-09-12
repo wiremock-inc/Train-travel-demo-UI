@@ -1,16 +1,8 @@
-import {
-    Component,
-    For,
-    JSX,
-    Match,
-    Show,
-    Switch,
-    createResource,
-} from 'solid-js';
+import {Component, createResource, For, JSX, Match, Switch,} from 'solid-js';
 import Select from '../components/forms/select';
 import Label from '../components/forms/label';
 import Row from '../components/forms/row';
-import {A, useNavigate, useSearchParams} from '@solidjs/router';
+import {useNavigate, useSearchParams} from '@solidjs/router';
 import Hr from '../components/hr';
 import H2 from '../components/typeography/H2';
 import {stationsController, tripsController} from '../lib/client';
@@ -19,7 +11,10 @@ import Spinner from '../components/spinner';
 import Button from '../components/forms/button';
 import {Trip} from '@wiremock-inc/apimatic-sdkgen-demo';
 
-const fetchStations = async () => await stationsController.getStations();
+const fetchStations = async () => {
+    const response = await stationsController.getStations();
+    return response.result.data;
+}
 
 const fetchTrips = async (state: {
     from?: string;
@@ -27,15 +22,17 @@ const fetchTrips = async (state: {
     date?: string;
 }) => {
     if (state.from && state.to && state.date) {
-        const response = await tripsController.getTrips(
-            state.from,
-            state.to,
-            state.date,
-        );
-
-        return response.result.data;
+        try {
+            const response = await tripsController.getTrips(
+                state.from,
+                state.to,
+                state.date,
+            );
+            return response.result.data;
+        } catch (e) {
+            throw e;
+        }
     }
-    return false;
 };
 
 const BookingFindPage: Component = () => {
@@ -47,26 +44,12 @@ const BookingFindPage: Component = () => {
             date: searchParams.date,
         };
     };
-    const [stationsResponse] = createResource(fetchStations);
-    const stations = () => {
-        if (stationsResponse()) {
-            return stationsResponse()!.result.data;
-        }
-        return [];
-    }
-    const stationsMetadata = () => {
-        if (stationsResponse()) {
-            return JSON.parse(stationsResponse()!.body).links;
-        }
-    }
+    const [stations] = createResource(fetchStations);
     const [trips] = createResource(derivedState, fetchTrips);
     const navigate = useNavigate();
     const selectTrip = (trip: Trip) => {
         navigate(`/booking/${trip.id}`);
     };
-    const navigatePage = (path: string) => {
-        const url = new URL(path);
-    }
 
     const changeFrom: JSX.EventHandler<HTMLSelectElement, InputEvent> = (e) =>
         setSearchParams({from: e.currentTarget.value});
@@ -129,69 +112,66 @@ const BookingFindPage: Component = () => {
             <Hr/>
 
             <div>
-                <Show when={!trips.loading && !trips()}>
-                    <p>Select departing station, destination station and a departure date to see a list of trips.</p>
-                </Show>
-                <Show when={trips.loading}>
-                    <Spinner/>
-                </Show>
-                <Show when={trips()}>
-                    <H2>Trips</H2>
-                    <table class="w-full text-sm text-left
+                <Switch
+                    fallback={<p class="mx-auto max-w-m text-center">Select departing station, destination station and
+                        a departure
+                        date to see a list of
+                        trips.</p>}>
+                    <Match when={trips.loading}>
+                        <Spinner/>
+                    </Match>
+                    <Match when={trips.error}>
+                        <div class="bg-red-900 rounded-md max-w-xl text-center p-4 mx-auto">
+                            <p>{trips.error.result.detail}</p>
+                        </div>
+                    </Match>
+                    <Match when={trips()?.length}>
+                        <H2>Trips</H2>
+                        <table class="w-full text-sm text-left
                     rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead class="text-gray-700 text-base bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th class="py-2 px-4">Operator</th>
-                            <th class="py-2 px-4">Price</th>
-                            <th class="py-2 px-4">Dogs allowed</th>
-                            <th class="py-2 px-4">Bicycles allowed</th>
-                            <th class="py-2 px-4">Arrival time</th>
-                            <th class="py-2 px-4">Depature time</th>
-                            <th class="py-2 px-4">Book</th>
-                        </tr>
-                        </thead>
-                        <tbody class="text-base">
-                        <For each={trips()}>
-                            {(trip) => (
-                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                    <td class="py-2 px-4">{trip.operator}</td>
-                                    <td class="py-2 px-4">{trip.price}</td>
-                                    <td class="py-2 px-4">
-                                        <Switch>
-                                            <Match when={trip.dogsAllowed === true}>Yes</Match>
-                                            <Match when={trip.dogsAllowed === false}>No</Match>
-                                        </Switch>
-                                    </td>
-                                    <td class="py-2 px-4">
-                                        <Switch>
-                                            <Match when={trip.bicyclesAllowed === true}>Yes</Match>
-                                            <Match when={trip.bicyclesAllowed === false}>No</Match>
-                                        </Switch>
-                                    </td>
-                                    <td class="py-2 px-4">{trip.arrivalTime}</td>
-                                    <td class="py-2 px-4">{trip.departureTime}</td>
-                                    <td class="py-2 px-4">
-                                        <Button onClick={() => selectTrip(trip)}>
-                                            <Cart/> Book
-                                        </Button>
-                                    </td>
-                                </tr>
-                            )}
-                        </For>
-                        </tbody>
-                    </table>
-
-                    <Show when={stationsMetadata()}>
-                        <ul class="my-6 grid grid-rows-1 grid-cols-2">
-                            <li class="justify-self-start"><Button disabled={!stationsMetadata().prev}
-                                                                   onClick={() => navigatePage(stationsMetadata().prev)}>Prev</Button>
-                            </li>
-                            <li class="justify-self-end"><Button disabled={!stationsMetadata().next}
-                                                                 onClick={() => navigatePage(stationsMetadata().next)}>Next</Button>
-                            </li>
-                        </ul>
-                    </Show>
-                </Show>
+                            <thead class="text-gray-700 text-base bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th class="py-2 px-4">Operator</th>
+                                <th class="py-2 px-4">Price</th>
+                                <th class="py-2 px-4">Dogs allowed</th>
+                                <th class="py-2 px-4">Bicycles allowed</th>
+                                <th class="py-2 px-4">Arrival time</th>
+                                <th class="py-2 px-4">Depature time</th>
+                                <th class="py-2 px-4">Book</th>
+                            </tr>
+                            </thead>
+                            <tbody class="text-base">
+                            <For each={trips()}>
+                                {(trip) => (
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                        <td class="py-2 px-4">{trip.operator}</td>
+                                        <td class="py-2 px-4">{trip.price}</td>
+                                        <td class="py-2 px-4">
+                                            <Switch>
+                                                <Match when={trip.dogsAllowed === true}>Yes</Match>
+                                                <Match when={trip.dogsAllowed === false}>No</Match>
+                                            </Switch>
+                                        </td>
+                                        <td class="py-2 px-4">
+                                            <Switch>
+                                                <Match when={trip.bicyclesAllowed === true}>Yes</Match>
+                                                <Match when={trip.bicyclesAllowed === false}>No</Match>
+                                            </Switch>
+                                        </td>
+                                        <td class="py-2 px-4">{trip.arrivalTime}</td>
+                                        <td class="py-2 px-4">{trip.departureTime}</td>
+                                        <td class="py-2 px-4">
+                                            <Button onClick={() => selectTrip(trip)}>
+                                                <Cart/> Book
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                )}
+                            </For>
+                            </tbody>
+                        </table>
+                    </Match>
+                </Switch>
             </div>
         </div>
     );

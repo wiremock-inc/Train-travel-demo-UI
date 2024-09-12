@@ -1,8 +1,7 @@
 import Hr from '../components/hr';
 import H1 from '../components/typeography/H1';
-import {bookingsController, tripsController} from "../lib/client";
-import {createResource} from "solid-js";
-import {For, Show} from "solid-js";
+import {bookingsController} from "../lib/client";
+import {createResource, ErrorBoundary, For, Show} from "solid-js";
 import Card from "../components/card";
 import Spinner from "../components/spinner";
 import Button from "../components/forms/button";
@@ -28,7 +27,7 @@ const MyBookingsPage = () => {
 
     return (
         <>
-            <H1>My Bookings</H1>
+            <H1>My bookings</H1>
 
             <Hr/>
 
@@ -38,7 +37,7 @@ const MyBookingsPage = () => {
             <Show when={!bookings.loading && !bookings()}>
                 <p>You have not made any bookings yet</p>
             </Show>
-            <Show when={bookings()}>
+            <ErrorBoundary fallback={<p>Something went wrong</p>}>
                 <For each={bookings()}>
                     {(booking) => (
                         <Card>
@@ -63,8 +62,7 @@ const MyBookingsPage = () => {
                         </Card>
                     )}
                 </For>
-            </Show>
-
+            </ErrorBoundary>
         </>
     );
 };
