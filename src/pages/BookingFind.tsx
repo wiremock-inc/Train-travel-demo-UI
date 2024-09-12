@@ -19,10 +19,7 @@ import Spinner from '../components/spinner';
 import Button from '../components/forms/button';
 import {Trip} from '@wiremock-inc/apimatic-sdkgen-demo';
 
-const fetchStations = async () => {
-    const response = await stationsController.getStations();
-    return response.result.data;
-};
+const fetchStations = async () => await stationsController.getStations();
 
 const fetchTrips = async (state: {
     from?: string;
@@ -43,7 +40,6 @@ const fetchTrips = async (state: {
 
 const BookingFindPage: Component = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [stations] = createResource(fetchStations);
     const derivedState = () => {
         return {
             from: searchParams.from,
@@ -51,11 +47,26 @@ const BookingFindPage: Component = () => {
             date: searchParams.date,
         };
     };
+    const [stationsResponse] = createResource(fetchStations);
+    const stations = () => {
+        if (stationsResponse()) {
+            return stationsResponse()!.result.data;
+        }
+        return [];
+    }
+    const stationsMetadata = () => {
+        if (stationsResponse()) {
+            return JSON.parse(stationsResponse()!.body).links;
+        }
+    }
     const [trips] = createResource(derivedState, fetchTrips);
     const navigate = useNavigate();
     const selectTrip = (trip: Trip) => {
         navigate(`/booking/${trip.id}`);
     };
+    const navigatePage = (path: string) => {
+        const url = new URL(path);
+    }
 
     const changeFrom: JSX.EventHandler<HTMLSelectElement, InputEvent> = (e) =>
         setSearchParams({from: e.currentTarget.value});
@@ -126,7 +137,8 @@ const BookingFindPage: Component = () => {
                 </Show>
                 <Show when={trips()}>
                     <H2>Trips</H2>
-                    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <table class="w-full text-sm text-left
+                    rtl:text-right text-gray-500 dark:text-gray-400">
                         <thead class="text-gray-700 text-base bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th class="py-2 px-4">Operator</th>
@@ -168,6 +180,17 @@ const BookingFindPage: Component = () => {
                         </For>
                         </tbody>
                     </table>
+
+                    <Show when={stationsMetadata()}>
+                        <ul class="my-6 grid grid-rows-1 grid-cols-2">
+                            <li class="justify-self-start"><Button disabled={!stationsMetadata().prev}
+                                                                   onClick={() => navigatePage(stationsMetadata().prev)}>Prev</Button>
+                            </li>
+                            <li class="justify-self-end"><Button disabled={!stationsMetadata().next}
+                                                                 onClick={() => navigatePage(stationsMetadata().next)}>Next</Button>
+                            </li>
+                        </ul>
+                    </Show>
                 </Show>
             </div>
         </div>
