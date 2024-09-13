@@ -16,7 +16,7 @@ const App: ParentComponent = (props) => {
                                 alt="WireMock Cloud" class="max-w-40"/>
                         </a>
                         <A href="/" class="text-gray-50 text-xl font-bold">
-                            Train travel demo app
+                            Train travel demo
                         </A>
                     </div>
 
