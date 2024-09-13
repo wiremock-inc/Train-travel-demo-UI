@@ -42,9 +42,9 @@ const App: ParentComponent = (props) => {
                 {props.children}
             </main>
 
-            <footer class="bg-white rounded-lg shadow m-4 dark:bg-gray-800 max-w-screen-xl mx-auto">
+            <footer class="bg-white rounded-lg shadow m-4 bg-gray-800 max-w-screen-xl mx-auto">
                 <div
-                    class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between text-sm text-gray-500 sm:text-center dark:text-gray-400">
+                    class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between text-sm text-gray-500 sm:text-center text-gray-400">
                     <div>
                         © 2024{' '}
                         <a href="https://wiremock.io/" class="hover:underline">
