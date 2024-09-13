@@ -58,12 +58,14 @@ const BookingFindPage: Component = () => {
     const changeDate: JSX.EventHandler<HTMLInputElement, Event> = (e) =>
         setSearchParams({date: e.currentTarget.value});
 
+    const tdClasses = "py-2 px-4 text-m group-hover:bg-gray-700 transition-all group-last:last:rounded-br-md group-last:first:rounded-bl-md";
     return (
         <div class="text-left">
             <form>
                 <H2>Find trip</H2>
 
-                <div class="grid sm:grid-cols-1 sm:grid-rows-3 md:grid-cols-3 md:grid-rows-1 gap-x-2.5">
+                <div
+                    class="grid sm:grid-cols-1 sm:grid-rows-3 md:grid-cols-3 md:grid-rows-1 gap-x-2.5">
                     <Row>
                         <Label for="from">Departing from</Label>
                         <Select id="from" onChange={changeFrom}>
@@ -127,40 +129,40 @@ const BookingFindPage: Component = () => {
                     </Match>
                     <Match when={trips()?.length}>
                         <H2>Trips</H2>
-                        <table class="w-full text-sm text-left
-                    rtl:text-right text-gray-500 text-gray-400">
-                            <thead class="text-gray-700 text-base bg-gray-50 bg-gray-700 text-gray-400">
+                        <table class="w-fulltext-left w-full
+                    rtl:text-right rounded-md">
+                            <thead class="text-base text-gray-400">
                             <tr>
-                                <th class="py-2 px-4">Operator</th>
-                                <th class="py-2 px-4">Price</th>
-                                <th class="py-2 px-4">Dogs allowed</th>
-                                <th class="py-2 px-4">Bicycles allowed</th>
-                                <th class="py-2 px-4">Arrival time</th>
-                                <th class="py-2 px-4">Depature time</th>
-                                <th class="py-2 px-4">Book</th>
+                                <th class="py-2 px-4 text-gray-100 text-l bg-gray-600 rounded-tl-md">Operator</th>
+                                <th class="py-2 px-4 text-gray-100 text-l bg-gray-600">Price</th>
+                                <th class="py-2 px-4 text-gray-100 text-l bg-gray-600">Dogs allowed</th>
+                                <th class="py-2 px-4 text-gray-100 text-l bg-gray-600">Bicycles allowed</th>
+                                <th class="py-2 px-4 text-gray-100 text-l bg-gray-600">Arrival time</th>
+                                <th class="py-2 px-4 text-gray-100 text-l bg-gray-600">Depature time</th>
+                                <th class="py-2 px-4 text-gray-100 text-l bg-gray-600 rounded-tr-md">Book</th>
                             </tr>
                             </thead>
                             <tbody class="text-base">
                             <For each={trips()}>
                                 {(trip) => (
-                                    <tr class="bg-white border-b bg-gray-800 border-gray-700">
-                                        <td class="py-2 px-4">{trip.operator}</td>
-                                        <td class="py-2 px-4">{trip.price}</td>
-                                        <td class="py-2 px-4">
+                                    <tr class="border-b bg-gray-800 border-gray-800 hover:text-gray-200 group">
+                                        <td class={tdClasses}>{trip.operator}</td>
+                                        <td class={tdClasses}>{trip.price}</td>
+                                        <td class={tdClasses}>
                                             <Switch>
                                                 <Match when={trip.dogsAllowed === true}>Yes</Match>
                                                 <Match when={trip.dogsAllowed === false}>No</Match>
                                             </Switch>
                                         </td>
-                                        <td class="py-2 px-4">
+                                        <td class={tdClasses}>
                                             <Switch>
                                                 <Match when={trip.bicyclesAllowed === true}>Yes</Match>
                                                 <Match when={trip.bicyclesAllowed === false}>No</Match>
                                             </Switch>
                                         </td>
-                                        <td class="py-2 px-4">{trip.arrivalTime}</td>
-                                        <td class="py-2 px-4">{trip.departureTime}</td>
-                                        <td class="py-2 px-4">
+                                        <td class={tdClasses}>{trip.arrivalTime}</td>
+                                        <td class={tdClasses}>{trip.departureTime}</td>
+                                        <td class={tdClasses}>
                                             <Button onClick={() => selectTrip(trip)}>
                                                 <Cart/> Book
                                             </Button>
