@@ -1,4 +1,4 @@
-import { JSX, ParentComponent, Show, createSignal } from 'solid-js';
+import { JSX, ParentComponent } from 'solid-js';
 import H1 from '../components/typeography/H1';
 import { useNavigate, useParams } from '@solidjs/router';
 import Row from '../components/forms/row';
