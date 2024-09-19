@@ -12,7 +12,7 @@ importers:
         specifier: ^0.13.6
         version: 0.13.6(solid-js@1.8.11)
       '@wiremock-inc/apimatic-sdkgen-demo':
-        specifier: ^1.0.3
+        specifier: ^1.0.4
         version: 1.0.4
       pnpm:
         specifier: ^9.4.0
