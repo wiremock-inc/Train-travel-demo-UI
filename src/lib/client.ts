@@ -8,7 +8,18 @@ import {
 } from '@wiremock-inc/apimatic-sdkgen-demo';
 import { createEffect, createSignal } from 'solid-js';
 
-const [host, setHost] = createSignal<string | false>(false);
+const DEFAULT_HOST = 'wm-train-travel.wiremockapi.cloud';
+
+const storedHost = () => {
+  return window.localStorage.getItem('overrideHost') ?? DEFAULT_HOST;
+};
+const [host, setHost] = createSignal<string | false>(storedHost());
+
+createEffect(() => {
+  if (host()) {
+    window.localStorage.setItem('overrideHost', host() as string);
+  }
+});
 
 let client;
 
@@ -42,6 +53,7 @@ createEffect(() => {
 });
 
 export {
+  DEFAULT_HOST,
   setHost,
   host,
   stationsController,

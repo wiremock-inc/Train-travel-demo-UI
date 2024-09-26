@@ -3,13 +3,14 @@ import { createSignal, JSX, ParentComponent, Show } from 'solid-js';
 import styles from './App.module.css';
 import { A } from '@solidjs/router';
 import Input from './components/forms/input';
-import { setHost, host } from './lib/client';
+import { setHost, host, DEFAULT_HOST } from './lib/client';
 import Button from './components/forms/button';
 
 const PROTOCOL_REGEXP = /https:\/\//g;
+const TRAILING_SLASH_REGEXP = /\/$/;
 
 const App: ParentComponent = (props) => {
-  const [overrideHost, setOverrideHost] = createSignal<string | false>(false);
+  const [overrideHost, setOverrideHost] = createSignal<string | false>(host());
   const navClasses =
     'gap-x-5 text-blue-400 text-base font-bold hover:text-gray-300';
 
@@ -19,16 +20,23 @@ const App: ParentComponent = (props) => {
   };
 
   const changeApiHost = () => {
-    if (PROTOCOL_REGEXP.test(overrideHost() as string)) {
-      setOverrideHost((overrideHost() as string).replace(PROTOCOL_REGEXP, ''));
+    let newOverride = overrideHost() as string;
+
+    if (PROTOCOL_REGEXP.test(newOverride)) {
+      newOverride = newOverride.replace(PROTOCOL_REGEXP, '');
     }
 
+    if (TRAILING_SLASH_REGEXP.test(newOverride)) {
+      newOverride = newOverride.replace(TRAILING_SLASH_REGEXP, '');
+    }
+
+    setOverrideHost(newOverride);
     setHost(overrideHost());
   };
 
   const resetHost = () => {
-    setHost(false);
-    setOverrideHost(false);
+    setHost(DEFAULT_HOST);
+    setOverrideHost(DEFAULT_HOST);
   };
 
   return (
@@ -71,17 +79,12 @@ const App: ParentComponent = (props) => {
               class="inline w-full"
               onChange={updateOverrideHost}
               placeholder="Override API host"
-              value={overrideHost() ? (overrideHost() as string) : ''}
+              value={host()}
             />
-            <Show when={!host()}>
-              <Button
-                onClick={() => changeApiHost()}
-                disabled={!overrideHost()}
-              >
-                Change
-              </Button>
-            </Show>
-            <Show when={host()}>
+            <Button onClick={() => changeApiHost()} disabled={!overrideHost()}>
+              Change
+            </Button>
+            <Show when={host() !== DEFAULT_HOST}>
               <Button onClick={() => resetHost()}>Reset</Button>
             </Show>
           </div>
