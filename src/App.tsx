@@ -1,11 +1,36 @@
-import type { ParentComponent } from 'solid-js';
+import { createSignal, JSX, ParentComponent, Show } from 'solid-js';
 
 import styles from './App.module.css';
 import { A } from '@solidjs/router';
+import Input from './components/forms/input';
+import { setHost, host } from './lib/client';
+import Button from './components/forms/button';
+
+const PROTOCOL_REGEXP = /https:\/\//g;
 
 const App: ParentComponent = (props) => {
+  const [overrideHost, setOverrideHost] = createSignal<string | false>(false);
   const navClasses =
     'gap-x-5 text-blue-400 text-base font-bold hover:text-gray-300';
+
+  const updateOverrideHost: JSX.EventHandler<HTMLInputElement, Event> = (e) => {
+    let value = e.currentTarget.value;
+    setOverrideHost(value);
+  };
+
+  const changeApiHost = () => {
+    if (PROTOCOL_REGEXP.test(overrideHost() as string)) {
+      setOverrideHost((overrideHost() as string).replace(PROTOCOL_REGEXP, ''));
+    }
+
+    setHost(overrideHost());
+  };
+
+  const resetHost = () => {
+    setHost(false);
+    setOverrideHost(false);
+  };
+
   return (
     <div class={styles.App}>
       <nav class="border-gray-400 border-b-2 mb-10">
@@ -38,6 +63,27 @@ const App: ParentComponent = (props) => {
             >
               My bookings
             </A>
+          </div>
+
+          <div class="flex gap-3 items-center flex-1">
+            <Input
+              id="apiURI"
+              class="inline w-full"
+              onChange={updateOverrideHost}
+              placeholder="Override API host"
+              value={overrideHost() ? (overrideHost() as string) : ''}
+            />
+            <Show when={!host()}>
+              <Button
+                onClick={() => changeApiHost()}
+                disabled={!overrideHost()}
+              >
+                Change
+              </Button>
+            </Show>
+            <Show when={host()}>
+              <Button onClick={() => resetHost()}>Reset</Button>
+            </Show>
           </div>
         </div>
       </nav>
